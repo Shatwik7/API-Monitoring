@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  apis          API[] // A user can have many APIs
+  alerts        Alert[] // A user can receive many alerts
+  notifications Notification[] // A user can have many notifications
+  settings      Settings? // A user has one set of settings
+}
+
+model API {
+  id            Int      @id @default(autoincrement())
+  url           String   
+  name          String?
+  description   String?
+  checkInterval Int // In minutes (e.g., 3 minutes)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  userId    Int
+  user      User       @relation(fields: [userId], references: [id])
+  apiChecks APICheck[] // Each API has multiple checks
+  incidents Incident[] // Each API can have multiple incidents
+  alerts    Alert[] // Alerts triggered for this API
+}
+
+model APICheck {
+  id                Int      @id @default(autoincrement())
+  apiId             Int
+  apiUrl            String
+  dnsLookupTime     Float
+  tcpConnectionTime Float
+  tlsHandshakeTime  Float
+  statusCode        Int
+  totalTime         Float
+  checkedAt         DateTime @default(now())
+
+  // Relations
+  api API @relation(fields: [apiId], references: [id])
+}
+
+model Alert {
+  id        Int      @id @default(autoincrement())
+  apiId     Int
+  userId    Int
+  message   String
+  createdAt DateTime @default(now())
+  seen      Boolean  @default(false)
+
+  // Relations
+  api  API  @relation(fields: [apiId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  message   String
+  userId    Int
+  seen      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Settings {
+  id                 Int     @id @default(autoincrement())
+  userId             Int     @unique
+  notifyByEmail      Boolean @default(true)
+  notifyBySMS        Boolean @default(false)
+  alertThresholdTime Int // Time in ms above which an alert is triggered
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Incident {
+  id          Int       @id @default(autoincrement())
+  apiId       Int
+  description String
+  severity    String // e.g., 'Critical', 'High', 'Medium', 'Low'
+  createdAt   DateTime  @default(now())
+  resolvedAt  DateTime?
+
+  // Relations
+  api API @relation(fields: [apiId], references: [id])
+}
