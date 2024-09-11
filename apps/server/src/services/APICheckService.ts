@@ -24,9 +24,9 @@ class APICheckService {
         date.setHours(date.getHours() - 24);
         const apiChecks = await prisma.aPICheck.findMany({
           where: {
-            apiId: apiId,  // Filter by API ID
+            apiId: apiId,
             checkedAt: {
-              gte: date,    // Get checks created after this date
+              gte: date,
             },
           },
         });

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import bg from "../assets/bg.jpg";
+// import bg from "../assets/bg.jpg";
 
 
 export default function LandingPage() {
@@ -31,7 +31,7 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center h-screen bg-cover bg-center bg-no-repeat text-white text-center px-6"
-               style={{ backgroundImage: `url(${bg})` }}>
+              /* style={{ backgroundImage: `url(${bg})` }}*/>
         <h1 className="mt-3 hero-text inline-block text-transparent font-semibold tracking-tight text-[60px] sm:text-[100px] lg:text-[115px] leading-[88%]">
           <div className="relative js-slide grid text-white">
             {words.map((word, index) => (
